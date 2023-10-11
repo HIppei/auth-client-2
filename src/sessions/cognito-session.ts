@@ -36,15 +36,28 @@ class CognitoSessionClass {
   }
 
   async isAlive() {
-    await 
+    const isSessionAlive = await new Promise<boolean>((resolve) => {
+      this.currentUser.getUserAttributes((err) => {
+        if (err) {
+          console.log(err);
+          resolve(false);
+        }
+        resolve(true);
+      });
+    });
 
-
-
+    return isSessionAlive;
   }
 
   signOut(redirectToAuthServer: () => void) {
-
-
+    this.currentUser.globalSignOut({
+      onSuccess() {
+        redirectToAuthServer();
+      },
+      onFailure(err) {
+        console.log(err);
+      },
+    });
   }
 }
 

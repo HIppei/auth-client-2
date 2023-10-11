@@ -1,6 +1,7 @@
 'use client';
 
 import { StorageKey } from '@/constants/storage-key';
+import CognitoSession from '@/sessions/cognito-session';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -19,7 +20,11 @@ export default function Page() {
         return;
       }
 
-      const res = await fetch('/api/token', { method: 'POST', body: JSON.stringify({ code: code }) });
+      const verifier = sessionStorage.getItem(StorageKey.AuthRequestPKCEVerifier);
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        body: JSON.stringify({ code: code, verifier: verifier }),
+      });
 
       if (!res.ok) {
         console.log('token exchange error');
@@ -27,10 +32,12 @@ export default function Page() {
       }
 
       const result: { userName: string; idToken: string; accessToken: string; refreshToken: string } = await res.json();
-
       if (result.userName && result.idToken && result.accessToken && result.refreshToken) {
+        CognitoSession.store(result);
+        push('/');
       }
     };
+
     exchangeToken();
   }, []);
 

@@ -29,7 +29,7 @@ export default function Page() {
       state: state,
     });
 
-    const redirectUrl = `${authConfig.serverUrl}?${params.toString()}`;
+    const redirectUrl = `${authConfig.authServerUrl}/authorize?${params.toString()}`;
     push(redirectUrl);
   }, []);
 
