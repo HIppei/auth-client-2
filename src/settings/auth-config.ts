@@ -1,9 +1,9 @@
 export const authConfig = {
   scope: 'openid profile email',
   responseType: 'code',
-  clientId: '12345',
+  clientId: '6789',
   clientSecret: process.env.CLIENT_SECRET,
-  redirectUri: 'http://localhost:3001/callback',
+  redirectUri: 'http://localhost:3002/callback',
   grantTyype: 'authorization_code',
   tokenType: 'Bearer',
   audience: process.env.NEXT_PUBLIC_USER_POOL_WEB_CLIENT_ID,

@@ -33,7 +33,7 @@ export default function Page() {
 
       const result: { userName: string; idToken: string; accessToken: string; refreshToken: string } = await res.json();
       if (result.userName && result.idToken && result.accessToken && result.refreshToken) {
-        CognitoSession.store(result);
+        CognitoSession.syncWithCurrentSessionData(result);
         push('/');
       }
     };

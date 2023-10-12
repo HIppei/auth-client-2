@@ -14,7 +14,7 @@ class CognitoSessionClass {
   });
   currentUser = new CognitoUser({ Username: '', Pool: this.userPool });
 
-  store({
+  syncWithCurrentSessionData({
     userName,
     idToken,
     accessToken,
@@ -35,7 +35,15 @@ class CognitoSessionClass {
     this.currentUser.setSignInUserSession(session);
   }
 
-  async isAlive() {
+  async isAlive(sessionData: { userName: string; idToken: string; accessToken: string; refreshToken: string }) {
+    this.syncWithCurrentSessionData(sessionData);
+    this.currentUser.getSession((err: Error) => {
+      if (err) {
+        console.log(err);
+        return false;
+      }
+    });
+
     const isSessionAlive = await new Promise<boolean>((resolve) => {
       this.currentUser.getUserAttributes((err) => {
         if (err) {
@@ -49,20 +57,20 @@ class CognitoSessionClass {
     return isSessionAlive;
   }
 
-  signOut(redirectToAuthServer: () => void) {
-    if (!this.currentUser.getSignInUserSession()) {
-      // Cache clear
-      this.currentUser.signOut();
-      redirectToAuthServer();
-    }
-    this.currentUser.globalSignOut({
-      onSuccess() {
-        redirectToAuthServer();
-      },
-      onFailure(err) {
-        console.log(err);
-      },
+  async signOut(redirectToAuthServer: () => void) {
+    await new Promise<void>((resolve) => {
+      this.currentUser.globalSignOut({
+        onSuccess() {
+          resolve();
+        },
+        onFailure(err) {
+          console.log(err);
+          resolve();
+        },
+      });
     });
+
+    redirectToAuthServer();
   }
 }
 
