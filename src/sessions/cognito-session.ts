@@ -50,6 +50,11 @@ class CognitoSessionClass {
   }
 
   signOut(redirectToAuthServer: () => void) {
+    if (!this.currentUser.getSignInUserSession()) {
+      // Cache clear
+      this.currentUser.signOut();
+      redirectToAuthServer();
+    }
     this.currentUser.globalSignOut({
       onSuccess() {
         redirectToAuthServer();

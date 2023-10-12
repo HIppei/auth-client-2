@@ -16,9 +16,16 @@ export const verifyIdToken = async (idToken: string) => {
     const userName = payload['cognito:username'] as string;
     if (!userName) throw new Error('invlaid_token');
 
-    const now = Math.floor(Date.now() / 1000);
-    if (!payload.iat || now < payload.iat) throw new Error('invalid_iat');
-    if (!payload.exp || now > payload.exp) throw new Error('invalid_exp');
+    const now = Math.ceil(Date.now() / 1000);
+    // If issued time and current time differenciate by before and after 300 seconds.
+    if (!payload.iat || Math.abs(now - payload.iat) > 300) {
+      console.log('Invalid iat', now, payload.iat);
+      throw new Error('invalid_iat');
+    }
+    if (!payload.exp || now > payload.exp) {
+      console.log('Invalid exp', now, payload.exp);
+      throw new Error('invalid_exp');
+    }
 
     return userName;
   } catch (err) {
